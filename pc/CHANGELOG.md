@@ -2,6 +2,11 @@
 
 What changed in each Savage Wind release. The `test` branch holds what the next one will contain.
 
+## MvDK Recomp 0.1.0 - 2026-11-08
+
+First release of the Mario vs. Donkey Kong port (on Savage Wind 0.4.1-alpha.4): the game set up from your own copy,
+shader translator and render fixes, ultrawide view, 60 fps frame pacing, Android touch controls and launcher art.
+
 ## Alpha 4.1 (0.4.1-alpha.4) - 2026-11-01
 
 **A quick fix update for Alpha 4.** Extract it over your Alpha 4 folder (Windows) or use the new AppImage (Linux): your

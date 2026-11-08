@@ -49,12 +49,12 @@ integrated graphics, which share the PC's RAM, 8 GB isn't enough: the game's 3 G
 to the GPU ([#117](https://github.com/Revivedx/SavageWindRecomp/issues/117)).
 
 1. Download from [Releases](https://github.com/Revivedx/SavageWindRecomp/releases):
-   - **Windows:** `SavageWind-0.4.1-alpha.4-windows.zip`. Extract it to a folder you can write to (not Program
+   - **Windows:** `SavageWind-0.1.0-windows.zip`. Extract it to a folder you can write to (not Program
      Files): your game files, saves and settings are kept in that folder.
-   - **Linux (x86-64, Steam Deck too):** `Savage_Wind-0.4.1-alpha.4-x86_64.AppImage`. Make it executable
+   - **Linux (x86-64, Steam Deck too):** `Savage_Wind-0.1.0-x86_64.AppImage`. Make it executable
      (`chmod +x`) and run it; your game files, saves and settings go to `~/.local/share/savagewind`. See
      [docs/linux.md](docs/linux.md).
-   - **Linux on ARM (aarch64):** `Savage_Wind-0.4.1-alpha.4-aarch64.AppImage` is **highly experimental**: so far
+   - **Linux on ARM (aarch64):** `Savage_Wind-0.1.0-aarch64.AppImage` is **highly experimental**: so far
      only a few contributors' boards have run it. Reports from real hardware are welcome
      ([docs/linux.md](docs/linux.md), "Testing on ARM").
 2. Run `savagewind.exe` (or the AppImage). The first time it asks for your game files: pick the folder with your own
