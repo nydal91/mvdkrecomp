@@ -1,0 +1,62 @@
+# Windows release of the PC port (pc/): build/dist/MvDK_Recomp-<version>-windows.zip from `make dist` on real Windows
+# (MSYS2 UCRT64) - the exe linked against an LGPL FFmpeg (make deps-windows), the game code generator frozen with
+# PyInstaller (make gen-helper, python.org CPython 3.12) and the zig compiler (tools/fetch_zig.sh) that builds the game
+# code on the player's machine. No game code or Nintendo data inside.
+# Run it from the Actions tab (Run workflow, with the release tag to attach the zip to), or push a v* tag.
+name: Windows release
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to attach the zip to (empty: only an artifact)"
+        default: "v0.1.0"
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 120
+    defaults:
+      run:
+        shell: msys2 {0}
+        working-directory: pc
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        id: py
+        with:
+          python-version: "3.12"
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: UCRT64
+          update: true
+          install: >-
+            make zip unzip curl mingw-w64-ucrt-x86_64-clang mingw-w64-ucrt-x86_64-lld mingw-w64-ucrt-x86_64-sdl3
+            mingw-w64-ucrt-x86_64-ffmpeg mingw-w64-ucrt-x86_64-vulkan-headers mingw-w64-ucrt-x86_64-vulkan-loader
+            mingw-w64-ucrt-x86_64-shaderc mingw-w64-ucrt-x86_64-spirv-tools mingw-w64-ucrt-x86_64-pkgconf
+            mingw-w64-ucrt-x86_64-nasm mingw-w64-ucrt-x86_64-binutils
+      - name: LGPL FFmpeg
+        run: make deps-windows
+      - name: Game code generator (PyInstaller)
+        run: make gen-helper GEN_PY="$(cygpath -u '${{ steps.py.outputs.python-path }}')"
+      - name: Compiler (zig)
+        run: tools/fetch_zig.sh
+      - name: Package
+        run: make -j$(nproc) dist && ls -l build/dist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MvDK_Recomp-windows
+          path: pc/build/dist/*.zip
+      - name: Attach to the release
+        if: github.event_name == 'push' || inputs.tag != ''
+        shell: bash
+        working-directory: .
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.event_name == 'push' && github.ref_name || inputs.tag }}
+        run: gh release upload "$TAG" pc/build/dist/*.zip --clobber -R "${{ github.repository }}"
