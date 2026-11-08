@@ -34,6 +34,7 @@ jobs:
       - uses: msys2/setup-msys2@v2
         with:
           msystem: UCRT64
+          release: false  # (the runner's own C:\msys64: no installer download)
           update: true
           install: >-
             make zip unzip curl mingw-w64-ucrt-x86_64-clang mingw-w64-ucrt-x86_64-lld mingw-w64-ucrt-x86_64-sdl3
