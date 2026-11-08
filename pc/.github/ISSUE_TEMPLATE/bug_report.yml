@@ -1,0 +1,93 @@
+name: Bug report
+description: Something in the game looks, sounds or behaves wrong, stutters, or crashes.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for testing Savage Wind! Every report shows how far the game really works.
+        **Never attach or link game files, keys, firmware, generated game code or save files**, and no links to
+        copies of the game: issues with any of them are removed.
+
+        Reports without `savagewind.log`, from an older release or from game version 1.8.2 get a `needs-info`
+        label, and are closed after 7 days if nothing changes (you can reopen them any time).
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before you start
+      options:
+        - label: I'm on the [latest release](https://github.com/Revivedx/SavageWindRecomp/releases), and the bug still happens there.
+          required: true
+        - label: I searched the [existing issues](https://github.com/Revivedx/SavageWindRecomp/issues?q=is%3Aissue) and this one isn't reported yet.
+          required: true
+  - type: dropdown
+    id: version
+    attributes:
+      label: Savage Wind version
+      description: Shown on the game's title screen, in Savage Wind Configuration and on the first line of `savagewind.log`.
+      options:
+        - "0.4.1-alpha.4 (latest)"
+        - "Built from the test branch"
+        - "An older release (please update and try again first)"
+    validations:
+      required: true
+  - type: dropdown
+    id: game_version
+    attributes:
+      label: Game version
+      description: >-
+        The update your game files have. 1.9.0, the latest, is the supported version. 1.8.2 still runs, but a bug
+        that only happens on 1.8.2 isn't fixed: please check it on 1.9.0 too.
+      options:
+        - "1.9.0"
+        - "1.8.2 (not supported)"
+    validations:
+      required: true
+  - type: input
+    id: system
+    attributes:
+      label: Your PC
+      description: Windows version or Linux distribution, GPU and its driver version, CPU.
+      placeholder: Windows 11 24H2, RTX 3060 (driver 581.29), Ryzen 5 5600X
+    validations:
+      required: true
+  - type: input
+    id: where
+    attributes:
+      label: Where in the game
+      description: The place, menu, cutscene or quest where it happened.
+      placeholder: Great Plateau, Eastern Abbey, at night
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened, and how to make it happen again
+      description: What you expected, what you saw instead, and the steps that lead to it.
+    validations:
+      required: true
+  - type: input
+    id: settings
+    attributes:
+      label: Settings
+      description: Frame rate, window size and fullscreen mode, and upscaler (Options > Settings > Video).
+      placeholder: 60 fps, 2560x1440 borderless, upscaler Off
+  - type: textarea
+    id: log
+    attributes:
+      label: savagewind.log
+      description: >-
+        Drag the file here. On Windows it's next to savagewind.exe, in the Savage Wind folder; on Linux, in
+        ~/.local/share/savagewind/. The game writes a new one each time it starts, so take it right after the bug
+        happened, before starting the game again; if you already did, savagewind.prev.log next to it is the run
+        before. Screenshots or a short video help too.
+      placeholder: Drag savagewind.log here
+    validations:
+      required: true
+  - type: checkboxes
+    id: legal
+    attributes:
+      label: Before sending
+      options:
+        - label: This report contains no game files, keys, firmware, generated game code, save files or links to copies of the game.
+          required: true
