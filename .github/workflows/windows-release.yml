@@ -41,6 +41,19 @@ jobs:
             mingw-w64-ucrt-x86_64-ffmpeg mingw-w64-ucrt-x86_64-vulkan-headers mingw-w64-ucrt-x86_64-vulkan-loader
             mingw-w64-ucrt-x86_64-shaderc mingw-w64-ucrt-x86_64-spirv-tools mingw-w64-ucrt-x86_64-pkgconf
             mingw-w64-ucrt-x86_64-nasm mingw-w64-ucrt-x86_64-binutils
+      - name: Downloads (retried; the build scripts check their sha256)
+        run: |
+          get() {  # dest url...
+            d=$1; shift
+            for i in $(seq 1 8); do for u in "$@"; do
+              curl -fL --retry 5 --retry-all-errors --connect-timeout 30 -o "$d.part" "$u" && mv "$d.part" "$d" && return 0
+            done; sleep 15; done
+            return 1
+          }
+          mkdir -p build/deps-win/src build/zig-dl
+          get build/deps-win/src/ffmpeg-9.0.2.tar.xz https://ffmpeg.org/releases/ffmpeg-9.0.2.tar.xz \
+              https://www.ffmpeg.org/releases/ffmpeg-9.0.2.tar.xz
+          get build/zig-dl/zig-x86_64-windows-0.17.0.zip https://ziglang.org/download/0.17.0/zig-x86_64-windows-0.17.0.zip
       - name: LGPL FFmpeg
         run: make deps-windows
       - name: Game code generator (PyInstaller)
