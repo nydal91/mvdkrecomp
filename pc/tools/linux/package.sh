@@ -14,7 +14,7 @@ P=$L/deps
 B=$L/game
 APPDIR=$L/AppDir
 VERSION=$(sed -n 's/^#define SAVAGEWIND_VERSION "\(.*\)"/\1/p' runtime/ui/launcher.mm)
-OUT=build/dist/Savage_Wind-$VERSION-$ARCH.AppImage
+OUT=build/dist/MvDK_Recomp-$VERSION-$ARCH.AppImage
 JOBS=$(nproc)
 
 tools/linux/build_deps.sh "$ARCH"
