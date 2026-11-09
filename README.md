@@ -20,7 +20,7 @@ first setup.
 - Games other than BotW: the recompiler builds without BotW's sites; the old SDK's audio renderer path; build/RomFS checks for MvDK.
 - Shader translator fixes (LDC addressing) for Mario's materials, ultrawide support (wide view), render-target scale fixes.
 - Frame pacing: the game steps once per frame, so it always runs at 60.
-- Android: CPU performance hints, touch controls, double-tap opens settings, MvDK Recomp launcher art and icon.
+- Android: CPU performance hints, touch controls, six fingers on the screen open the settings, MvDK Recomp launcher art and icon.
 
 ## License
 

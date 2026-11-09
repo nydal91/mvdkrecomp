@@ -204,59 +204,37 @@ bool touch_event(const SDL_Event *e) {
     return true;
 }
 
-// Double tap: a tap is a finger down and up within TAP_MS, moved less than TAP_MOVE (screen heights); the second
-// must start within DTAP_MS of the first's lift and land within DTAP_DIST of it. One finger at a time (a second
-// finger down meanwhile is no tap). With the touch controls on, a tap that starts on a button or in the stick's part
-// is the controls' (double-tapping A to jump twice opens nothing).
-#define TAP_MS 250
-#define TAP_MOVE 0.04f
-#define DTAP_MS 350
-#define DTAP_DIST 0.12f
-bool touch_double_tap(const SDL_Event *e) {
-    static SDL_FingerID id;
-    static bool down, eligible;
-    static float x0, y0, last_x, last_y;
-    static uint64_t t0, last_up;
-    static int fingers;
-    if (e->type != SDL_EVENT_FINGER_DOWN && e->type != SDL_EVENT_FINGER_MOTION && e->type != SDL_EVENT_FINGER_UP &&
-        e->type != SDL_EVENT_FINGER_CANCELED)
+// Six fingers on the screen at once open the settings: the event is the finger down that makes six (counted by
+// finger id, so a lost finger-up can't leave the count high). Once it has fired, the fingers still down belong to the
+// gesture until they've all lifted (touch_gesture_held: the menu swallows them, so they don't click in it).
+#define GESTURE_FINGERS 6
+#define MAX_FINGERS 16
+static SDL_FingerID g_down[MAX_FINGERS];
+static int g_ndown;
+static bool g_gesture_held;
+bool touch_settings_gesture(const SDL_Event *e) {
+    if (e->type != SDL_EVENT_FINGER_DOWN && e->type != SDL_EVENT_FINGER_UP && e->type != SDL_EVENT_FINGER_CANCELED)
         return false;
     if (e->tfinger.touchID == SDL_MOUSE_TOUCHID) return false;
-    SDL_Window *w = SDL_GetWindowFromID(e->tfinger.windowID);
-    int ww = 0, wh = 0;
-    float a = w && SDL_GetWindowSize(w, &ww, &wh) && ww > 0 && wh > 0 ? (float)ww / wh : aspect;
-    float x = e->tfinger.x * a, y = e->tfinger.y;
-    uint64_t now = SDL_GetTicks();
-    if (e->type == SDL_EVENT_FINGER_DOWN) {
-        fingers++;
-        if (fingers > 1) { down = false, last_up = 0; return false; }
-        int role = ROLE_LOOK;
-        if (enabled()) {
-            float sa = aspect;
-            aspect = a;
-            role = hit(x, y);
-            aspect = sa;
-        }
-        id = e->tfinger.fingerID, down = true, eligible = role == ROLE_LOOK, x0 = x, y0 = y, t0 = now;
+    SDL_FingerID id = e->tfinger.fingerID;
+    int at = -1;
+    for (int i = 0; i < g_ndown; i++)
+        if (g_down[i] == id) at = i;
+    if (e->type != SDL_EVENT_FINGER_DOWN) {
+        if (at >= 0) g_down[at] = g_down[--g_ndown];
+        if (!g_ndown) g_gesture_held = false;
         return false;
     }
-    if (e->type == SDL_EVENT_FINGER_MOTION) {
-        if (down && e->tfinger.fingerID == id && hypotf(x - x0, y - y0) > TAP_MOVE) eligible = false;
-        return false;
-    }
-    if (fingers > 0) fingers--;
-    if (!down || e->tfinger.fingerID != id) return false;
-    down = false;
-    bool tap = e->type == SDL_EVENT_FINGER_UP && eligible && now - t0 <= TAP_MS && hypotf(x - x0, y - y0) <= TAP_MOVE;
-    if (!tap) { last_up = 0; return false; }
-    if (last_up && t0 - last_up <= DTAP_MS && hypotf(x0 - last_x, y0 - last_y) <= DTAP_DIST) {
-        last_up = 0;
-        LOG("[touch] double tap at %.3f,%.3f: settings\n", x, y);
+    if (at < 0 && g_ndown < MAX_FINGERS) g_down[g_ndown++] = id;
+    if (g_ndown >= GESTURE_FINGERS && !g_gesture_held) {
+        g_gesture_held = true;
+        LOG("[touch] %d fingers: settings\n", g_ndown);
         return true;
     }
-    last_up = now, last_x = x, last_y = y;
     return false;
 }
+
+bool touch_gesture_held(void) { return g_gesture_held; }
 
 uint64_t touch_buttons(void) {
     if (!touch_active()) return 0;
